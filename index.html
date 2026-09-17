@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AutoOffice — An office of AI agents</title>
+    <meta
+      name="description"
+      content="A fully staffed office of AI agents, running on your own machine. 17 divisions, 54 teams, 179 identities, one SQLite database inside a workspace folder you own. Opening Friday 18 September 2026."
+    />
+    <link rel="canonical" href="https://cursivecrow.github.io/AutoOffice/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AutoOffice — An office of AI agents" />
+    <meta
+      property="og:description"
+      content="A fully staffed office of AI agents, running on your own machine. Opening Friday 18 September 2026."
+    />
+    <meta property="og:url" content="https://cursivecrow.github.io/AutoOffice/" />
+    <meta property="og:image" content="https://cursivecrow.github.io/AutoOffice/assets/office-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/thumbnail.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Spline+Sans+Mono:wght@400;500;700&display=swap"
+    />
+    <style>
+      /* Tokens lifted from the application's own stylesheet (src/renderer/styles.css),
+         so the page and the product read as one system. */
+      :root {
+        color-scheme: light;
+        --canvas: #efece2;
+        --paper: #f7f5ee;
+        --surface-strong: #fbf9f3;
+        --band: #f3f0e6;
+        --selected: #f0ead6;
+        --ink: #26241f;
+        --muted: #6d6754;
+        --label: #57523f;
+        --faded: #b9b19c;
+        --rust: #bf4128;
+        --rust-deep: #a33418;
+        --rust-underline: #e0684c;
+        --green: #3e7a52;
+        --rule: #ddd7c7;
+        --border: #d8d2c0;
+        --radius: 2px;
+        --mono: 'Spline Sans Mono', ui-monospace, Consolas, monospace;
+        --gutter: 24px;
+        --measure: 1120px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        text-rendering: optimizeLegibility;
+        font-synthesis: none;
+      }
+
+      a {
+        color: var(--rust-deep);
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--rust);
+        outline-offset: 2px;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: var(--measure);
+        margin: 0 auto;
+        padding-inline: var(--gutter);
+      }
+
+      /* ---------- top bar ---------- */
+
+      .topbar {
+        border-bottom: 1px solid var(--rule);
+        background: var(--paper);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 54px;
+        flex-wrap: wrap;
+        padding-block: 8px;
+      }
+
+      .wordmark {
+        font-weight: 800;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      .topnav {
+        display: flex;
+        gap: 22px;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .topnav a {
+        color: var(--label);
+        text-decoration: none;
+        padding-bottom: 2px;
+        border-bottom: 2px solid transparent;
+      }
+
+      .topnav a:hover,
+      .topnav a:focus-visible {
+        color: var(--ink);
+        border-bottom-color: var(--rust-underline);
+      }
+
+      /* ---------- hero ---------- */
+
+      .hero-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 48px;
+        align-items: center;
+        padding-block: 68px 60px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--rust-deep);
+        margin: 0 0 18px;
+      }
+
+      .eyebrow::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--rust);
+      }
+
+      h1 {
+        font-size: clamp(40px, 5.6vw, 64px);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1;
+        margin: 0 0 22px;
+        text-wrap: balance;
+      }
+
+      .lede {
+        font-size: 18px;
+        color: var(--label);
+        margin: 0 0 30px;
+        max-width: 48ch;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .btn {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 13px 22px;
+        border-radius: var(--radius);
+        border: 1px solid transparent;
+      }
+
+      .btn-primary {
+        background: var(--rust);
+        color: #fff;
+        border-color: var(--rust);
+      }
+
+      .btn-primary:hover,
+      .btn-primary:focus-visible {
+        background: var(--rust-deep);
+        border-color: var(--rust-deep);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+        border-color: var(--border);
+      }
+
+      .btn-ghost:hover,
+      .btn-ghost:focus-visible {
+        border-color: var(--ink);
+        background: var(--surface-strong);
+      }
+
+      .cta-note {
+        margin: 16px 0 0;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      .hero-art img {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+
+      /* ---------- opening clock ---------- */
+      /* An office announces when it opens on a plaque by the door, not with a marketing badge. */
+
+      .clock {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-strong);
+        margin: 0 0 30px;
+      }
+
+      .clock-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 6px 14px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--rule);
+        background: var(--band);
+      }
+
+      .clock-label {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--rust-deep);
+      }
+
+      .clock-date {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: var(--label);
+      }
+
+      .clock-digits {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .clock-unit {
+        padding: 16px 8px 15px;
+        text-align: center;
+        border-right: 1px solid var(--rule);
+      }
+
+      .clock-unit:last-child {
+        border-right: 0;
+      }
+
+      .clock-num {
+        display: block;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+      }
+
+      .clock-unit-label {
+        display: block;
+        margin-top: 3px;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .clock-open {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 20px;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--green);
+      }
+
+      .clock-open::before {
+        content: '';
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      /* ---------- full-bleed banner ---------- */
+
+      .bleed {
+        margin: 0;
+        background: var(--band);
+        border-block: 1px solid var(--rule);
+      }
+
+      .bleed img {
+        width: 100%;
+      }
+
+      .bleed figcaption {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-align: center;
+        padding: 14px var(--gutter);
+        border-top: 1px solid var(--rule);
+        background: var(--paper);
+      }
+
+      /* ---------- sections ---------- */
+
+      .section {
+        padding-block: 76px;
+      }
+
+      .section-alt {
+        background: var(--paper);
+        border-block: 1px solid var(--rule);
+      }
+
+      /* The application marks every section with an uppercase mono label followed by a
+         hairline rule running to the edge. The page keeps that idiom. */
+      .band {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 34px;
+      }
+
+      .band h2 {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin: 0;
+        white-space: nowrap;
+        color: var(--label);
+      }
+
+      .band::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--rule);
+      }
+
+      .section-intro {
+        font-size: 20px;
+        max-width: 60ch;
+        margin: 0 0 40px;
+        color: var(--ink);
+        text-wrap: pretty;
+      }
+
+      /* ---------- app screenshot ---------- */
+
+      .shot {
+        margin: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-strong);
+        overflow: hidden;
+      }
+
+      .shot img {
+        width: 100%;
+      }
+
+      .callouts {
+        list-style: none;
+        margin: 34px 0 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 26px;
+      }
+
+      .callouts h3 {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--rust-deep);
+        margin: 0 0 7px;
+      }
+
+      .callouts p {
+        margin: 0;
+        font-size: 15px;
+        color: var(--label);
+      }
+
+      /* ---------- roster stats ---------- */
+
+      .roster {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 0 30px;
+        border-top: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+        padding-block: 18px;
+      }
+
+      .roster > div {
+        padding-right: 30px;
+        margin-right: 30px;
+        border-right: 1px solid var(--rule);
+      }
+
+      .roster > div:last-child {
+        border-right: 0;
+        margin-right: 0;
+        padding-right: 0;
+      }
+
+      .stat-value {
+        font-size: 25px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
+      }
+
+      .stat-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ---------- the directory board (signature) ---------- */
+
+      .directory {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-strong);
+        padding: 10px 0;
+        columns: 2;
+        column-gap: 0;
+      }
+
+      .dir-row {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 9px 26px;
+        break-inside: avoid;
+      }
+
+      .dir-row + .dir-row {
+        border-top: 1px solid var(--rule);
+      }
+
+      .dir-name {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .dir-leader {
+        flex: 1;
+        border-bottom: 1px dotted var(--faded);
+        transform: translateY(-4px);
+        min-width: 14px;
+      }
+
+      .dir-count {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .dir-note {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 16px 0 0;
+      }
+
+      /* ---------- feature blocks ---------- */
+
+      .blocks {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 1px;
+        background: var(--rule);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+      }
+
+      .block {
+        background: var(--surface-strong);
+        padding: 28px 26px 30px;
+      }
+
+      .block h3 {
+        font-size: 19px;
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        margin: 0 0 10px;
+      }
+
+      .block p {
+        margin: 0;
+        color: var(--label);
+        font-size: 15px;
+      }
+
+      .block-tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--rust-deep);
+        display: block;
+        margin-bottom: 12px;
+      }
+
+      /* ---------- opening day ---------- */
+
+      .run-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: 40px;
+        align-items: start;
+      }
+
+      pre {
+        margin: 0 0 18px;
+        background: var(--ink);
+        color: #f2efe4;
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+      }
+
+      pre .prompt {
+        color: var(--faded);
+        user-select: none;
+      }
+
+      .run-note {
+        font-size: 15px;
+        color: var(--label);
+        margin: 0;
+      }
+
+      .req {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border-top: 1px solid var(--rule);
+      }
+
+      .req li {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 18px;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--rule);
+        font-size: 15px;
+      }
+
+      .req-key {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .req-value {
+        text-align: right;
+        color: var(--ink);
+      }
+
+      /* ---------- footer ---------- */
+
+      footer {
+        background: var(--paper);
+        border-top: 1px solid var(--rule);
+        padding-block: 40px;
+      }
+
+      .foot-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 40px;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+
+      .foot-inner p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+        max-width: 62ch;
+      }
+
+      /* Specificity note: .foot-inner p also matches this element, so the class is
+         qualified by its parent to win on color and size. */
+      .foot-inner .foot-date {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--rust-deep);
+        white-space: nowrap;
+      }
+
+      /* ---------- responsive ---------- */
+
+      @media (max-width: 900px) {
+        .hero-inner {
+          grid-template-columns: 1fr;
+          gap: 40px;
+          padding-block: 48px 44px;
+        }
+
+        .hero-art {
+          order: -1;
+        }
+
+        .run-grid {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+
+        .directory {
+          columns: 1;
+        }
+
+        .section {
+          padding-block: 58px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .roster > div {
+          padding-right: 18px;
+          margin-right: 18px;
+        }
+
+        .stat-value {
+          font-size: 21px;
+        }
+
+        .dir-row {
+          padding-inline: 16px;
+        }
+
+        .clock-num {
+          font-size: 26px;
+        }
+
+        .clock-unit {
+          padding-inline: 4px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="wordmark" href="#top">AutoOffice</a>
+        <nav class="topnav" aria-label="Primary">
+          <a href="#preview">Preview</a>
+          <a href="#organization">Organization</a>
+          <a href="#opening">Opening day</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Opening Friday</p>
+          <h1>A fully staffed office, running on your machine.</h1>
+          <p class="lede">
+            AutoOffice stands up a whole organization of AI agents locally. Each one has a role, a
+            private memory, and a place in the chain of approval — and everything they decide and
+            produce is recorded in one SQLite database, inside a workspace folder you own.
+          </p>
+
+          <div class="clock">
+            <div class="clock-head">
+              <span class="clock-label">Opens</span>
+              <span class="clock-date">Friday 18 September 2026 · 12:01&nbsp;AM PDT</span>
+            </div>
+            <div class="clock-digits" id="countdown" data-target="2026-09-18T00:01:00-07:00" aria-hidden="true">
+              <div class="clock-unit">
+                <span class="clock-num" data-unit="days">—</span>
+                <span class="clock-unit-label">Days</span>
+              </div>
+              <div class="clock-unit">
+                <span class="clock-num" data-unit="hours">—</span>
+                <span class="clock-unit-label">Hours</span>
+              </div>
+              <div class="clock-unit">
+                <span class="clock-num" data-unit="minutes">—</span>
+                <span class="clock-unit-label">Minutes</span>
+              </div>
+              <div class="clock-unit">
+                <span class="clock-num" data-unit="seconds">—</span>
+                <span class="clock-unit-label">Seconds</span>
+              </div>
+            </div>
+            <p class="clock-open" id="clock-open" hidden>The office is open</p>
+          </div>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#preview">See what's coming</a>
+            <a class="btn btn-ghost" href="#opening">Opening day</a>
+          </div>
+          <p class="cta-note">The source repository opens with the application on Friday.</p>
+        </div>
+
+        <div class="hero-art">
+          <img
+            src="assets/thumbnail.png"
+            width="1254"
+            height="1254"
+            alt="Illustration of three AutoOffice coworkers at their desks reviewing a floor plan of the office."
+          />
+        </div>
+      </section>
+
+      <section class="section section-alt" id="preview">
+        <div class="wrap">
+          <div class="band"><h2>A look inside</h2></div>
+          <p class="section-intro">
+            One window holds the whole company: the directory of divisions and teams on the left, the
+            selected agent in the middle, and the live floor on the right.
+          </p>
+          <figure class="shot">
+            <img
+              src="assets/app-screenshot.png"
+              width="1800"
+              height="1100"
+              loading="lazy"
+              alt="The AutoOffice application: a division and team directory, an agent record showing rhythm and profile settings, and an isometric view of the office floor."
+            />
+          </figure>
+          <ul class="callouts">
+            <li>
+              <h3>The directory</h3>
+              <p>
+                Every division, team, and agent in one tree. Selecting an agent opens its record;
+                starting or pausing one is a single control.
+              </p>
+            </li>
+            <li>
+              <h3>The agent record</h3>
+              <p>
+                Role, organizational home, current work, and the rhythm that governs how long it
+                works before it takes a break or goes into recess.
+              </p>
+            </li>
+            <li>
+              <h3>The floor</h3>
+              <p>
+                An editable spatial view of the real organization. Pan and zoom the office, find an
+                agent, and watch conversation activity as it happens.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <figure class="bleed">
+        <img
+          src="assets/office-banner.png"
+          width="1672"
+          height="941"
+          loading="lazy"
+          alt="Wide illustration of the AutoOffice interface beside a cutaway of an office floor with rooms labelled Operations, Projects and Design."
+        />
+        <figcaption>The office is a place, not a queue — every agent has a division, a desk, and a record</figcaption>
+      </figure>
+
+      <section class="section" id="organization">
+        <div class="wrap">
+          <div class="band"><h2>The organization</h2></div>
+          <p class="section-intro">
+            A new office opens fully staffed. Each division has one director; each team has a lead and
+            two members. You are the Executive Director, and you can read or change every mutable
+            fact in the office at any time.
+          </p>
+          <div class="roster">
+            <div>
+              <div class="stat-value">17</div>
+              <div class="stat-label">Divisions</div>
+            </div>
+            <div>
+              <div class="stat-value">54</div>
+              <div class="stat-label">Teams</div>
+            </div>
+            <div>
+              <div class="stat-value">179</div>
+              <div class="stat-label">Identities</div>
+            </div>
+            <div>
+              <div class="stat-value">1</div>
+              <div class="stat-label">Database</div>
+            </div>
+          </div>
+          <div class="directory">
+            <div class="dir-row"><span class="dir-name">Operations</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Finance &amp; Corporate Affairs</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Portfolio &amp; Delivery</span><span class="dir-leader"></span><span class="dir-count">4 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Evidence &amp; Intelligence</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Computer Science</span><span class="dir-leader"></span><span class="dir-count">6 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Mathematical Sciences</span><span class="dir-leader"></span><span class="dir-count">4 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Philosophy</span><span class="dir-leader"></span><span class="dir-count">4 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Applied R&amp;D</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Design</span><span class="dir-leader"></span><span class="dir-count">2 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Physical Engineering &amp; Production</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Software Engineering</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Platform &amp; Tooling</span><span class="dir-leader"></span><span class="dir-count">5 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Writing</span><span class="dir-leader"></span><span class="dir-count">2 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Media</span><span class="dir-leader"></span><span class="dir-count">2 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Publishing</span><span class="dir-leader"></span><span class="dir-count">2 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Marketing</span><span class="dir-leader"></span><span class="dir-count">2 teams</span></div>
+            <div class="dir-row"><span class="dir-name">Commercial &amp; Customer</span><span class="dir-leader"></span><span class="dir-count">3 teams</span></div>
+          </div>
+          <p class="dir-note">
+            The starting roster — divisions, teams, and every agent in them can be renamed, moved, added, or retired
+          </p>
+        </div>
+      </section>
+
+      <section class="section section-alt">
+        <div class="wrap">
+          <div class="band"><h2>How the work holds together</h2></div>
+          <div class="blocks">
+            <div class="block">
+              <span class="block-tag">The record</span>
+              <h3>One database, one writer</h3>
+              <p>
+                Everything the office knows lives in one SQLite file. A single process owns every
+                write, transactions are atomic, and activity is immutable by revision — so the record
+                cannot drift away from what actually happened.
+              </p>
+            </div>
+            <div class="block">
+              <span class="block-tag">Authority</span>
+              <h3>Permission is checked, not assumed</h3>
+              <p>
+                An agent runs commands in a project only while it holds authority for a task there.
+                Protected actions need a signed decision and produce an exact receipt, and file
+                access stays inside the roots you permit.
+              </p>
+            </div>
+            <div class="block">
+              <span class="block-tag">Models</span>
+              <h3>Your models, your machine</h3>
+              <p>
+                Run local inference through llama.cpp with per-connection LoRA adapters, or a Codex
+                subscription, with fallback when a provider fails. Training plans need signatures,
+                take the GPU exclusively, and roll back if the evaluation gate fails.
+              </p>
+            </div>
+            <div class="block">
+              <span class="block-tag">The charter</span>
+              <h3>A constitution that can be amended</h3>
+              <p>
+                Office, division, and team charters set purpose, ownership, and decision rights. They
+                are inherited and revisioned, and changing one is an explicit amendment decision
+                rather than an edit that quietly takes effect.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="opening">
+        <div class="wrap">
+          <div class="band"><h2>Opening day</h2></div>
+          <div class="run-grid">
+            <div>
+              <pre><code><span class="prompt">&gt; </span>npm run bootstrap:offline
+<span class="prompt">&gt; </span>npm start</code></pre>
+              <p class="run-note">
+                Two commands, and the office is standing. Everything installs from a local cache — the
+                bootstrap downloads no packages from the network and verifies each vendored artifact
+                against a recorded checksum. Choose <strong>Open workspace</strong>, pick a folder,
+                and the office is created inside it.
+              </p>
+            </div>
+            <ul class="req">
+              <li><span class="req-key">Platform</span><span class="req-value">Windows x64</span></li>
+              <li><span class="req-key">Runtime</span><span class="req-value">Node.js 24, or the vendored distribution</span></li>
+              <li><span class="req-key">Local inference</span><span class="req-value">llama.cpp, CPU or CUDA</span></li>
+              <li><span class="req-key">Training</span><span class="req-value">NVIDIA GPU, optional</span></li>
+              <li><span class="req-key">License</span><span class="req-value">Apache&#8209;2.0</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap foot-inner">
+        <p>
+          AutoOffice is licensed under the Apache License 2.0. It bundles third-party components
+          under their own licenses; the CUDA-accelerated inference path includes the NVIDIA CUDA
+          runtime, which carries its own EULA. The repository, the license, and the full third-party
+          notices open with the application.
+        </p>
+        <p class="foot-date">Opens 18 September 2026</p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var board = document.getElementById('countdown');
+        var openNote = document.getElementById('clock-open');
+        if (!board) return;
+
+        var target = new Date(board.getAttribute('data-target')).getTime();
+        if (isNaN(target)) return;
+
+        var fields = {};
+        ['days', 'hours', 'minutes', 'seconds'].forEach(function (unit) {
+          fields[unit] = board.querySelector('[data-unit="' + unit + '"]');
+        });
+
+        var timer = null;
+
+        function pad(value) {
+          return value < 10 ? '0' + value : String(value);
+        }
+
+        function render() {
+          var remaining = target - Date.now();
+
+          if (remaining <= 0) {
+            if (timer) clearInterval(timer);
+            board.hidden = true;
+            if (openNote) openNote.hidden = false;
+            return;
+          }
+
+          var seconds = Math.floor(remaining / 1000);
+          fields.days.textContent = String(Math.floor(seconds / 86400));
+          fields.hours.textContent = pad(Math.floor(seconds / 3600) % 24);
+          fields.minutes.textContent = pad(Math.floor(seconds / 60) % 60);
+          fields.seconds.textContent = pad(seconds % 60);
+        }
+
+        render();
+        timer = setInterval(render, 1000);
+      })();
+    </script>
+  </body>
+</html>

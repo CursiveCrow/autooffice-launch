@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="AutoOffice">
+  <rect width="32" height="32" rx="2" fill="#efece2" />
+  <rect x="5" y="7" width="22" height="13" rx="1" fill="#26241f" />
+  <rect x="8" y="10" width="11" height="2" rx="1" fill="#efece2" opacity="0.55" />
+  <rect x="8" y="14" width="16" height="2" rx="1" fill="#efece2" opacity="0.3" />
+  <rect x="5" y="23" width="22" height="3" rx="1" fill="#bf4128" />
+</svg>
