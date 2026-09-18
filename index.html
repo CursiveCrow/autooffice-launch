@@ -6,14 +6,14 @@
     <title>AutoOffice — An office of AI agents</title>
     <meta
       name="description"
-      content="A fully staffed office of AI agents, running on your own machine. Opening Friday 18 September 2026."
+      content="A fully staffed office of AI agents, running on your own machine. Available now for Windows x64."
     />
     <link rel="canonical" href="https://cursivecrow.github.io/autooffice-launch/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="AutoOffice — An office of AI agents" />
     <meta
       property="og:description"
-      content="A fully staffed office of AI agents, running on your own machine. Opening Friday 18 September 2026."
+      content="A fully staffed office of AI agents, running on your own machine. Available now for Windows x64."
     />
     <meta property="og:url" content="https://cursivecrow.github.io/autooffice-launch/" />
     <meta
@@ -145,6 +145,14 @@
         background: var(--rust);
       }
 
+      .eyebrow-open {
+        color: var(--green);
+      }
+
+      .eyebrow-open::before {
+        background: var(--green);
+      }
+
       h1 {
         font-size: clamp(40px, 5.6vw, 64px);
         font-weight: 800;
@@ -167,6 +175,46 @@
         font-size: 11px;
         letter-spacing: 0.06em;
         color: var(--muted);
+      }
+
+      /* ---------- download ---------- */
+
+      .download {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px 20px;
+        margin-top: 26px;
+      }
+
+      .btn {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: #fff;
+        background: var(--rust);
+        border: 1px solid var(--rust);
+        border-radius: var(--radius);
+        padding: 14px 24px;
+      }
+
+      .btn:hover,
+      .btn:focus-visible {
+        background: var(--rust-deep);
+        border-color: var(--rust-deep);
+      }
+
+      .download-meta {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        color: var(--label);
       }
 
       .hero-art img {
@@ -304,7 +352,7 @@
 
     <main class="wrap hero">
       <div>
-        <p class="eyebrow">Opening Friday</p>
+        <p class="eyebrow eyebrow-open">Now open</p>
         <h1>A fully staffed office, running on your machine.</h1>
         <p class="lede">
           AutoOffice stands up a whole organization of AI agents locally. Each one has a role, a
@@ -314,36 +362,18 @@
 
         <div class="clock">
           <div class="clock-head">
-            <span class="clock-label">Opens</span>
+            <span class="clock-label">Opened</span>
             <span class="clock-date">Friday 18 September 2026 · 12:01&nbsp;AM PDT</span>
           </div>
-          <div
-            class="clock-digits"
-            id="countdown"
-            data-target="2026-09-18T00:01:00-07:00"
-            aria-hidden="true"
-          >
-            <div class="clock-unit">
-              <span class="clock-num" data-unit="days">—</span>
-              <span class="clock-unit-label">Days</span>
-            </div>
-            <div class="clock-unit">
-              <span class="clock-num" data-unit="hours">—</span>
-              <span class="clock-unit-label">Hours</span>
-            </div>
-            <div class="clock-unit">
-              <span class="clock-num" data-unit="minutes">—</span>
-              <span class="clock-unit-label">Minutes</span>
-            </div>
-            <div class="clock-unit">
-              <span class="clock-num" data-unit="seconds">—</span>
-              <span class="clock-unit-label">Seconds</span>
-            </div>
-          </div>
-          <p class="clock-open" id="clock-open" hidden>The office is open</p>
+          <p class="clock-open">The office is open</p>
         </div>
 
-        <p class="note">The source repository opens with the application on Friday.</p>
+        <div class="download">
+          <a class="btn" href="https://github.com/CursiveCrow/autooffice-launch/releases/tag/v1.0.0">Download for Windows</a>
+          <p class="download-meta">Version 1.0.0 · Windows x64 · 3.3&nbsp;GB in two archives</p>
+        </div>
+
+        <p class="note">Download both archives and extract them into the same folder, then run AgentOffice.exe.</p>
       </div>
 
       <div class="hero-art">
@@ -355,47 +385,5 @@
         />
       </div>
     </main>
-
-    <script>
-      (function () {
-        var board = document.getElementById('countdown');
-        var openNote = document.getElementById('clock-open');
-        if (!board) return;
-
-        var target = new Date(board.getAttribute('data-target')).getTime();
-        if (isNaN(target)) return;
-
-        var fields = {};
-        ['days', 'hours', 'minutes', 'seconds'].forEach(function (unit) {
-          fields[unit] = board.querySelector('[data-unit="' + unit + '"]');
-        });
-
-        var timer = null;
-
-        function pad(value) {
-          return value < 10 ? '0' + value : String(value);
-        }
-
-        function render() {
-          var remaining = target - Date.now();
-
-          if (remaining <= 0) {
-            if (timer) clearInterval(timer);
-            board.hidden = true;
-            if (openNote) openNote.hidden = false;
-            return;
-          }
-
-          var seconds = Math.floor(remaining / 1000);
-          fields.days.textContent = String(Math.floor(seconds / 86400));
-          fields.hours.textContent = pad(Math.floor(seconds / 3600) % 24);
-          fields.minutes.textContent = pad(Math.floor(seconds / 60) % 60);
-          fields.seconds.textContent = pad(seconds % 60);
-        }
-
-        render();
-        timer = setInterval(render, 1000);
-      })();
-    </script>
   </body>
 </html>
